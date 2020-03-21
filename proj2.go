@@ -83,7 +83,7 @@ func bytesToUUID(data []byte) (ret uuid.UUID) {
 }
 
 // The structure definition for a user record
-type User struct {
+type User2 struct {
 	Username string
 	MacUsername[] byte
 	SaltHKDF[] byte
@@ -97,6 +97,20 @@ type User struct {
 	// Note for JSON to marshal/unmarshal, the fields need to
 	// be public (start with a capital letter)
 }
+
+type User struct {
+	Username string
+	SecretKeyEnc userlib.PKEDecKey
+	DSSignKey userlib.DSSignKey
+	MAC[] byte
+	//TODO: Add files and access tokens
+
+
+	// You can add other fields here if you want...
+	// Note for JSON to marshal/unmarshal, the fields need to
+	// be public (start with a capital letter)
+}
+
 
 
 // This creates a user.  It will only be called once for a user
@@ -120,6 +134,7 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	userdataptr = &userdata
 
 	//TODO: This is a toy implementation.
+	/*
 	userdata.Username = username //setting username
 	userdata.PrivateKeys = make(map[string]string) //initializing map
 	//generate random salt for hkdf and password
@@ -164,6 +179,62 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	userlib.DatastoreSet(UUID, data)
 
 	//End of toy implementation
+	*/
+
+	//******************* START OF NEW IMPLEMENTATION ********************************************************************
+	var hkdfKey = userlib.Argon2Key([]byte (password), []byte(username), 32) //key generated to generate more keys using HKDF
+
+	//MAC key generated for MAC'ing
+	var macKey, _ = userlib.HashKDF(hkdfKey, []byte("mac"))
+	macKey = macKey[:16]
+
+	//Symmetric key generated used for symmetric encryption
+	var symmetricKey, _ = userlib.HashKDF(hkdfKey, []byte("symmetric key"))
+	symmetricKey = symmetricKey[:16]
+
+	//Generate public & private keys for public key crypto
+	var pk userlib.PKEEncKey
+	var sk userlib.PKEDecKey
+	pk, sk, _ = userlib.PKEKeyGen()
+
+	//Generate public & private keys for digital signatures
+	var vk userlib.DSVerifyKey
+	var dssk userlib.DSSignKey
+	dssk, vk, _ = userlib.DSKeyGen()
+
+	errorPKE := userlib.KeystoreSet(username + " " + "public key", pk) //storing public key in Keystore
+	errorDS := userlib.KeystoreSet(username + " " + "verify key", vk) //storing verify key in Keystore
+
+	//error if username already exists
+	if errorPKE != nil {
+		return nil, errorPKE
+	} else if errorDS != nil {
+		return nil, errorDS
+	}
+
+	var macUsername, _ = userlib.HMACEval(macKey, []byte(username)) //Hash (MAC) username so that we can use bytesToUUID
+
+	//Storing username, secret key, and signing key in user struct
+	userdata.Username = username
+	userdata.DSSignKey = dssk
+	userdata.SecretKeyEnc = sk
+
+	var UUID = bytesToUUID(macUsername)
+
+	var data, _ = json.Marshal(userdata)
+	//encrypt user data
+	var encryptedData = userlib.SymEnc(symmetricKey, userlib.RandomBytes(16), data)
+	//mac user data
+	var MAC, _ = userlib.HMACEval(macKey, encryptedData)
+
+
+	var dataPlusMAC =  append(encryptedData[:], MAC[:]...) //appending MAC to encrypted user struct
+	//print(len(x) == len(encryptedData) + len(MAC))
+	//println("TOTAL:")
+	//println(x)
+
+	userlib.DatastoreSet(UUID, dataPlusMAC)
+	//********************************** END OF NEW IMPLEMENTATION *****************************************************************
 	return &userdata, nil
 }
 
@@ -176,8 +247,7 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	var userdata User
 	userdataptr = &userdata
 
-	var all_zeroes = make([]byte, 16)
-	println("ALL ZEROES: " ,all_zeroes)
+	/*var all_zeroes = make([]byte, 16)
 
 	var macUsername, _ = userlib.HMACEval(all_zeroes, []byte(username)) //Hash (MAC) username so that we can use bytesToUUID
 	userdata.MacUsername = macUsername
@@ -187,14 +257,46 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	//var macKey, _ = userlib.HashKDF(hkdfKey, []byte("mac")) //MAC key used for MAC-ing other keys
 
 	var userStruct, ok = userlib.DatastoreGet(UUID)
-	ok = ok
+	if !ok {
+		return nil, errors.New("username does not exist")
+	}
 
-	json.Unmarshal(userStruct, &UUID)
-	print("UUID STRING" + UUID.String())
+	_ = json.Unmarshal(userStruct, &userdata)
+	print("username: " + userdata.Username)
 
 	//var userStruct_username = userStruct.Username
 	//
 	//if username != userStruct. or
+*/
+	//******************* START OF NEW IMPLEMENTATION ********************************************************************
+	var hkdfKey = userlib.Argon2Key([]byte (password), []byte(username), 32) //key generated to generate more keys using HKDF
+
+	var macKey, _ = userlib.HashKDF(hkdfKey, []byte("mac")) //mac key to recover UUID
+	macKey = macKey[:16]
+
+	var symmKey, _ = userlib.HashKDF(hkdfKey, []byte("symmetric key"))
+	symmKey = symmKey[:16]
+
+	var macUsername, _ = userlib.HMACEval(macKey, []byte(username)) //Hash (MAC) username so that we can use bytesToUUID
+	var UUID = bytesToUUID(macUsername)
+	var data, ok = userlib.DatastoreGet(UUID)
+	if ok == false {
+		return nil, errors.New("Username/Password invalid")
+	}
+	//TODO: MAKE SURE Math is right
+	var ciphertext = data[0: len(data) - 64]
+	var macRec = data[len(data) - 64: ] //Mac received from Datastore
+	var macComp, _ = userlib.HMACEval(macKey, ciphertext) //recompute MAC
+
+	if !userlib.HMACEqual(macRec, macComp) {
+		return nil, errors.New("data corrupted")
+	}
+
+	//Data is now verified, now decrypt data
+
+	var decryptedData = userlib.SymDec(symmKey, ciphertext)
+	_ = json.Unmarshal(decryptedData, userdataptr)
+	//******************* END OF NEW IMPLEMENTATION ********************************************************************
 
 	return userdataptr, nil
 }
