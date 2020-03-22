@@ -4,15 +4,15 @@ package proj2
 // imports it will break the autograder, and we will be Very Upset.
 
 import (
-	"testing"
-	"reflect"
-	"github.com/cs161-staff/userlib"
-	_ "encoding/json"
 	_ "encoding/hex"
-	_ "github.com/google/uuid"
-	_ "strings"
+	_ "encoding/json"
 	_ "errors"
+	"github.com/cs161-staff/userlib"
+	_ "github.com/google/uuid"
+	"reflect"
 	_ "strconv"
+	_ "strings"
+	"testing"
 )
 
 func clear() {
@@ -34,11 +34,19 @@ func TestInit(t *testing.T) {
 		t.Error("Failed to initialize user", err)
 		return
 	}
+	t.Log(make([]byte, 16))
 	// t.Log() only produces output if you run with "go test -v"
 	t.Log("Got user", u)
 	// If you want to comment the line above,
 	// write _ = u here to make the compiler happy
 	// You probably want many more tests here.
+	u1, err1 := GetUser("alice", "fubar")
+	if err1 != nil {
+		// t.Error says the test fails
+		t.Error("Failed to login user, error:", err1)
+		return
+	}
+	t.Log("Logged in user", u1)
 }
 
 func TestStorage(t *testing.T) {
