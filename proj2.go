@@ -358,25 +358,24 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 	//update FileMap
 	userdata.FileMap = fileMap
 	//get user data from DataStore.
-	oldUserData, err := GetUser(userdata.Username, userdata.Password)
+	_, err := GetUser(userdata.Username, userdata.Password)
 	if err != nil {
 		print("Error occurred. ")
 		return
 	}
-	oldUserData = userdata
+	newUserData := userdata
 
 	var macUsername, _ = userlib.HMACEval(macKey, username) //Hash (MAC) username so that we can use bytesToUUID
 	var UUID = bytesToUUID(macUsername)
 	//Marshal the userdata struct, so it's JSON encoded.
-	var newUserData, _ = json.Marshal(oldUserData)
+	var newUserDataMarshalled, _ = json.Marshal(newUserData)
 	//encrypt user data
-	var encryptedData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), newUserData)
+	var encryptedData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), newUserDataMarshalled)
 	//mac user data
 	var MAC, _ = userlib.HMACEval(macKey, encryptedData)
 	var dataPlusMAC =  append(encryptedData[:], MAC[:]...) //appending MAC to encrypted user struct
 	userlib.DatastoreSet(UUID, dataPlusMAC)
 	//End of toy implementation
-
 
 	return
 }

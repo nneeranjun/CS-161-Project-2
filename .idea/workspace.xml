@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="804f47ae-ce5e-4ac3-9ff4-4ce71d1360fe" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proj2.go" beforeDir="false" afterPath="$PROJECT_DIR$/proj2.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proj2_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/proj2_test.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,12 +15,21 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/proj2.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="547">
-              <caret line="375" column="99" selection-start-line="375" selection-start-column="99" selection-end-line="375" selection-end-column="99" />
+            <state relative-caret-position="316">
+              <caret line="372" column="94" selection-start-line="372" selection-start-column="94" selection-end-line="372" selection-end-column="94" />
               <folding>
                 <element signature="e#2460#2793#0" />
                 <element signature="e#3988#6026#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/proj2_test.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="645">
+              <caret line="53" column="40" selection-start-line="53" selection-start-column="40" selection-end-line="53" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -41,15 +48,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="396">
               <caret line="184" column="5" selection-start-line="184" selection-start-column="5" selection-end-line="184" selection-end-column="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/proj2_test.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="645">
-              <caret line="53" column="40" selection-start-line="53" selection-start-column="40" selection-end-line="53" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -135,7 +133,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Test.TestInit in CS-161-Project-2">
+  <component name="RunManager" selected="Go Test.proj2_test.go">
     <configuration name="TestInit in CS-161-Project-2" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="CS-161-Project-2" />
       <working_directory value="$PROJECT_DIR$" />
@@ -215,19 +213,29 @@
       <filePath value="$PROJECT_DIR$/proj2_test.go" />
       <method v="2" />
     </configuration>
+    <configuration name="proj2_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="CS-161-Project-2" />
+      <working_directory value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/proj2_test.go" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Go Test.TestInit in CS-161-Project-2" />
       <item itemvalue="Go Test.TestInit in proj2_test.go" />
       <item itemvalue="Go Test.TestStorage in proj2_test.go" />
       <item itemvalue="Go Test.go test CS-161-Project-2" />
+      <item itemvalue="Go Test.proj2_test.go" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestInit in CS-161-Project-2" />
+        <item itemvalue="Go Test.proj2_test.go" />
         <item itemvalue="Go Test.TestInit in proj2_test.go" />
         <item itemvalue="Go Test.TestStorage in proj2_test.go" />
-        <item itemvalue="Go Test.go test CS-161-Project-2" />
         <item itemvalue="Go Test.TestInit in CS-161-Project-2" />
+        <item itemvalue="Go Test.go test CS-161-Project-2" />
       </list>
     </recent_temporary>
   </component>
@@ -245,7 +253,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3252315" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32520324" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39930555" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -253,7 +261,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" weight="0.04398148" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.27293843" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -276,13 +284,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/proj2_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="645">
-          <caret line="53" column="40" selection-start-line="53" selection-start-column="40" selection-end-line="53" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/go/src/github.com/cs161-staff/userlib/userlib.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="396">
@@ -297,10 +298,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/proj2_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="645">
+          <caret line="53" column="40" selection-start-line="53" selection-start-column="40" selection-end-line="53" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/proj2.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="547">
-          <caret line="375" column="99" selection-start-line="375" selection-start-column="99" selection-end-line="375" selection-end-column="99" />
+        <state relative-caret-position="316">
+          <caret line="372" column="94" selection-start-line="372" selection-start-column="94" selection-end-line="372" selection-end-column="94" />
           <folding>
             <element signature="e#2460#2793#0" />
             <element signature="e#3988#6026#0" />
