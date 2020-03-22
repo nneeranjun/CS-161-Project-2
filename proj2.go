@@ -100,9 +100,11 @@ type User2 struct {
 
 type User struct {
 	Username string
+	Password string
 	SecretKeyEnc userlib.PKEDecKey
 	DSSignKey userlib.DSSignKey
 	MAC[] byte
+	FileMap map[string][]byte
 	//TODO: Add files and access tokens
 
 
@@ -192,12 +194,12 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	var symmetricKey, _ = userlib.HashKDF(hkdfKey, []byte("symmetric key"))
 	symmetricKey = symmetricKey[:16]
 
-	//Generate public & private keys for public key crypto
+	//Generate public & private keys for public key crypto. RSA Encryption guarantees confidentiality for asymmetric-keys.
 	var pk userlib.PKEEncKey
 	var sk userlib.PKEDecKey
 	pk, sk, _ = userlib.PKEKeyGen()
 
-	//Generate public & private keys for digital signatures
+	//Generate public & private keys for digital signatures. RSA Signatures guarantee integrity + authenticity for asymmetric-keys.
 	var vk userlib.DSVerifyKey
 	var dssk userlib.DSSignKey
 	dssk, vk, _ = userlib.DSKeyGen()
@@ -214,13 +216,20 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 
 	var macUsername, _ = userlib.HMACEval(macKey, []byte(username)) //Hash (MAC) username so that we can use bytesToUUID
 
+
 	//Storing username, secret key, and signing key in user struct
 	userdata.Username = username
+	userdata.Password = password
 	userdata.DSSignKey = dssk
 	userdata.SecretKeyEnc = sk
 
+	// TODO: Make empty File map? For now, assuming we add file map in StoreFile.
+	//userdata.FileMap = make(map[string][]byte)
+
 	var UUID = bytesToUUID(macUsername)
 
+
+	//Marshal the userdata struct, so it's JSON encoded.
 	var data, _ = json.Marshal(userdata)
 	//encrypt user data
 	var encryptedData = userlib.SymEnc(symmetricKey, userlib.RandomBytes(16), data)
@@ -288,11 +297,11 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	var macRec = data[len(data) - 64: ] //Mac received from Datastore
 	var macComp, _ = userlib.HMACEval(macKey, ciphertext) //recompute MAC
 
-	if !userlib.HMACEqual(macRec, macComp) {
+	if userlib.HMACEqual(macRec, macComp) == false {
 		return nil, errors.New("data corrupted")
 	}
 
-	//Data is now verified, now decrypt data
+	//Data is now verified, can decrypt data
 
 	var decryptedData = userlib.SymDec(symmKey, ciphertext)
 	_ = json.Unmarshal(decryptedData, userdataptr)
@@ -308,10 +317,66 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 func (userdata *User) StoreFile(filename string, data []byte) {
 
 	//TODO: This is a toy implementation.
-	UUID, _ := uuid.FromBytes([]byte(filename + userdata.Username)[:16])
-	packaged_data, _ := json.Marshal(data)
-	userlib.DatastoreSet(UUID, packaged_data)
+	//We will hash the filename using SHA256 to hide the filename length and then
+	// encrypt the file contents and sign this file using the private key generated
+	// from the Digital Signature library of the person who is uploading it.
+
+	//encrypt and MAC the file
+
+	//if err != nil {
+	//
+	//} else {
+	//	if userData.
+	//}
+
+
+	username := []byte(userdata.Username)
+	password := []byte(userdata.Password)
+	fileMap := make(map[string][]byte)
+
+	//make mac key
+	var hkdfKey = userlib.Argon2Key(password, username, 32)
+	var macKey, _ = userlib.HashKDF(hkdfKey, []byte("mac"))
+	macKey = macKey[:16]
+	//make symmetric key
+	var symmKey, _ = userlib.HashKDF(hkdfKey, []byte("symmetric key"))
+	symmKey = symmKey[:16]
+
+	// Use hash function to hide the filename length.
+	zeroKey := make([]byte, 16) //byte array of 16 0's
+	macFilename, _ := userlib.HMACEval(zeroKey, []byte(filename)) // HashFunction(filename) = HMAC(0, filename)
+
+	//TODO: If the file has been shared with others, the file must stay shared.
+	//Marshal the file contents, so it's JSON encoded.
+	var marshalFileData, _ = json.Marshal(data)
+	//encrypt file contents
+	var encryptedFileData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), marshalFileData)
+	//mac file contents
+	var fileDataMAC, _ = userlib.HMACEval(macKey, encryptedFileData)
+	var encMACFile =  append(encryptedFileData[:], fileDataMAC[:]...) //appending MAC to encrypted file contents
+	fileMap[string(macFilename)] = encMACFile
+	//update FileMap
+	userdata.FileMap = fileMap
+	//get user data from DataStore.
+	oldUserData, err := GetUser(userdata.Username, userdata.Password)
+	if err != nil {
+		print("Error occurred. ")
+		return
+	}
+	oldUserData = userdata
+
+	var macUsername, _ = userlib.HMACEval(macKey, username) //Hash (MAC) username so that we can use bytesToUUID
+	var UUID = bytesToUUID(macUsername)
+	//Marshal the userdata struct, so it's JSON encoded.
+	var newUserData, _ = json.Marshal(oldUserData)
+	//encrypt user data
+	var encryptedData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), newUserData)
+	//mac user data
+	var MAC, _ = userlib.HMACEval(macKey, encryptedData)
+	var dataPlusMAC =  append(encryptedData[:], MAC[:]...) //appending MAC to encrypted user struct
+	userlib.DatastoreSet(UUID, dataPlusMAC)
 	//End of toy implementation
+
 
 	return
 }
