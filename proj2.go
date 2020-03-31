@@ -8,6 +8,7 @@ import (
 	// You neet to add with
 	// go get github.com/cs161-staff/userlib
 	"github.com/cs161-staff/userlib"
+	"golang.org/x/crypto/openpgp/packet"
 
 	// Life is much easier with json:  You are
 	// going to want to use this so you can easily
@@ -119,10 +120,11 @@ type User struct {
 type AccessToken struct {
 	 SymmetricKey[] byte
 	 UniqueIdentifier[] byte
+	 MacKey[] byte
 }
 
 type File struct {
-	Contents[] byte
+	Contents[][] byte
 	//SharingTree SharingTree
 }
 
@@ -130,7 +132,9 @@ type File struct {
 func (user *User) GenerateAccessToken(filename string) (accessToken AccessToken){
 	hkdfKey := getHKDFKey([]byte(user.Username), []byte(user.Password))
 	symmKey, _ := userlib.HashKDF(hkdfKey, []byte(filename)) //TODO: this could be repeating for the same filename!
-	uI := userlib.RandomBytes(20)
+	uI := userlib.RandomBytes(16)
+	macKey := userlib.RandomBytes(16)
+	accessToken.MacKey = macKey
 	accessToken.SymmetricKey = symmKey
 	accessToken.UniqueIdentifier = uI
 	return accessToken
@@ -227,15 +231,12 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	macKey, symmKey := encryptionHelper([]byte(password), []byte(username))
 	var macUsername, _ = userlib.HMACEval(macKey, []byte(username)) //Hash (MAC) username so that we can use bytesToUUID
 	var UUID = bytesToUUID(macUsername)
-	var data, ok = userlib.DatastoreGet(UUID)
+	var datastoreUser, ok = userlib.DatastoreGet(UUID)
 	if ok == false {
 		return nil, errors.New("Username/Password invalid")
 	}
-	//println(" ")
-	//println("AT GET USER")
-	//println("LENGTH OF DATA: ", data)
-	var ciphertext = data[0: len(data) - 64]
-	var macRec = data[len(data) - 64: ] //Mac received from Datastore
+	var ciphertext = datastoreUser[0: len(datastoreUser) - 64]
+	var macRec = datastoreUser[len(datastoreUser) - 64: ] //Mac received from Datastore
 	var macComp, _ = userlib.HMACEval(macKey, ciphertext) //recompute MAC
 
 	if userlib.HMACEqual(macRec, macComp) == false {
@@ -245,23 +246,7 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	//Data is now verified, can decrypt data
 	var decryptedData = userlib.SymDec(symmKey, ciphertext)
 	_ = json.Unmarshal(decryptedData, userdataptr)
-	//println("Printing user struct fields after calling storefile: ")
-	//println("username: ", userdataptr.Username)
-	//println("password: ", userdataptr.Password)
-	//println("MAC: ", userdataptr.MAC)
-	//println("File name: ", userdataptr.FileNames)
-	//println("File contents: ", userdataptr.FileContents)
 
-	//println("File Map: ", userdataptr.FileMap)
-	//zeroKey := make([]byte, 16) //byte array of 16 0's
-	//macFilename, _ := userlib.HMACEval(zeroKey, []byte("file1")) // HashFunction(filename) = HMAC(0, filename)
-	//println("filename: ", string(macFilename))
-	//v, ok := userdataptr.FileMap[string(macFilename)]
-	//v = v
-	//println("KEY SHOULD BE THERE! 89(EQUALS TRUE!) : ", ok)
-	//println("filename value: ", v)
-	//println("END OF GET USER")
-	//println("")
 	return userdataptr, nil
 }
 
@@ -282,29 +267,34 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 	//******************************START NEW IMPLEMENTATION ***************************************
 	var fileMapData map[string] File
 
-	filesUUID, _ := uuid.FromBytes([]byte("Files"))
-	data, ok := userlib.DatastoreGet(filesUUID)
 	//TODO: Verify integrity of map
 	//TODO: decrypt map
-	_ = json.Unmarshal(data, fileMapData) //getting fileMap map
 
-	if !ok {
-		return //file map has been deleted
-	}
 
 
 	accessToken := userdata.GenerateAccessToken(filename) //generate access token
+
+	//Encrypt File Contents
+	encrypedContents := userlib.SymEnc(accessToken.SymmetricKey, userlib.RandomBytes(16), data)
+	encMacContents, _ := userlib.HMACEval(accessToken.MacKey, encrypedContents)
+
+
+
+	//Mac File Contents
+
+	//Create File
+
+	//Store in DataStore
+
+
+
+
 	userdata.AccessTokenMap[filename] = accessToken //store access token associated with filename
-	
+
 	fileMapData[string(accessToken.UniqueIdentifier)] = data
-	//
 
 
-	fileMapData[string(accessToken.UniqueIdentifier)] =
 
-
-	accessToken := userdata.GenerateAccessToken(filename) //generate access token
-	userdata.AccessTokenMap[filename] = accessToken //store access token associated with filename
 
 
 
@@ -451,8 +441,6 @@ func (userdata *User) LoadFile(filename string) (data []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
-
-
 
 	//fileMap := currentUserData.FileMap
 

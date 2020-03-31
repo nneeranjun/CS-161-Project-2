@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="804f47ae-ce5e-4ac3-9ff4-4ce71d1360fe" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/CS-161-Project-2.test" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/jupyterhub.sqlite" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/jupyterhub_cookie_secret" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proj2.go" beforeDir="false" afterPath="$PROJECT_DIR$/proj2.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proj2_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/proj2_test.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,8 +16,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/proj2.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1636">
-              <caret line="227" column="68" lean-forward="true" selection-start-line="227" selection-start-column="68" selection-end-line="227" selection-end-column="68" />
+            <state relative-caret-position="532">
+              <caret line="473" column="24" lean-forward="true" selection-start-line="473" selection-start-column="24" selection-end-line="473" selection-end-column="24" />
               <folding>
                 <element signature="e#2346#2401#0" />
               </folding>
@@ -41,7 +37,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/proj2_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1380">
+            <state relative-caret-position="1635">
               <caret line="119" selection-start-line="119" selection-end-line="119" />
             </state>
           </provider>
@@ -247,10 +243,10 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1920" y="23" width="1680" height="973" extended-state="0" />
+    <frame x="-1911" y="23" width="1911" height="971" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.047911547" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.042495966" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -263,7 +259,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.18793504" />
+      <window_info anchor="bottom" id="Terminal" order="10" weight="0.1853547" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -295,8 +291,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/proj2.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1636">
-          <caret line="227" column="68" lean-forward="true" selection-start-line="227" selection-start-column="68" selection-end-line="227" selection-end-column="68" />
+        <state relative-caret-position="532">
+          <caret line="473" column="24" lean-forward="true" selection-start-line="473" selection-start-column="24" selection-end-line="473" selection-end-column="24" />
           <folding>
             <element signature="e#2346#2401#0" />
           </folding>
@@ -312,7 +308,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/proj2_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1380">
+        <state relative-caret-position="1635">
           <caret line="119" selection-start-line="119" selection-end-line="119" />
         </state>
       </provider>
