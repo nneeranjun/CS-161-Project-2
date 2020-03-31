@@ -2,8 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="804f47ae-ce5e-4ac3-9ff4-4ce71d1360fe" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/CS-161-Project-2.test" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jupyterhub.sqlite" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jupyterhub_cookie_secret" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proj2.go" beforeDir="false" afterPath="$PROJECT_DIR$/proj2.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proj2_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/proj2_test.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,30 +20,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/proj2.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
-              <caret line="91" column="21" selection-start-line="91" selection-start-column="14" selection-end-line="91" selection-end-column="21" />
+            <state relative-caret-position="-1636">
+              <caret line="227" column="68" lean-forward="true" selection-start-line="227" selection-start-column="68" selection-end-line="227" selection-end-column="68" />
               <folding>
-                <element signature="e#1288#2215#0" />
                 <element signature="e#2346#2401#0" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/proj2_test.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="705">
-              <caret line="57" column="5" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file:///usr/local/go/src/encoding/json/encode.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2145">
-              <caret line="156" column="5" selection-start-line="156" selection-start-column="5" selection-end-line="156" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -49,6 +34,15 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2475">
               <caret line="184" column="5" selection-start-line="184" selection-start-column="5" selection-end-line="184" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/proj2_test.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1380">
+              <caret line="119" selection-start-line="119" selection-end-line="119" />
             </state>
           </provider>
         </entry>
@@ -87,16 +81,17 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="29" />
+    <option name="x" value="-1911" />
     <option name="y" value="23" />
-    <option name="width" value="1680" />
-    <option name="height" value="969" />
+    <option name="width" value="1911" />
+    <option name="height" value="971" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -108,7 +103,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -253,15 +247,15 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="29" y="23" width="1680" height="969" extended-state="0" />
+    <frame x="-1920" y="23" width="1680" height="973" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.0485258" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.047911547" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32520324" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39930555" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -269,7 +263,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.33566433" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.18793504" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -294,8 +288,18 @@
     </entry>
     <entry file="file:///usr/local/go/src/encoding/json/encode.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2145">
-          <caret line="156" column="5" selection-start-line="156" selection-start-column="5" selection-end-line="156" selection-end-column="5" />
+        <state relative-caret-position="909">
+          <caret line="64" selection-start-line="64" selection-end-line="64" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/proj2.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1636">
+          <caret line="227" column="68" lean-forward="true" selection-start-line="227" selection-start-column="68" selection-end-line="227" selection-end-column="68" />
+          <folding>
+            <element signature="e#2346#2401#0" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -308,19 +312,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/proj2_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="57" column="5" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/proj2.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="91" column="21" selection-start-line="91" selection-start-column="14" selection-end-line="91" selection-end-column="21" />
-          <folding>
-            <element signature="e#1288#2215#0" />
-            <element signature="e#2346#2401#0" />
-          </folding>
+        <state relative-caret-position="1380">
+          <caret line="119" selection-start-line="119" selection-end-line="119" />
         </state>
       </provider>
     </entry>

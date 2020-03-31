@@ -82,6 +82,12 @@ func bytesToUUID(data []byte) (ret uuid.UUID) {
 	return
 }
 
+func getHKDFKey(password []byte, username []byte) (hkdfKey []byte) {
+	//MAC key generated for MAC'ing
+	hkdfKey = userlib.Argon2Key(password, username, 32)
+	return hkdfKey
+}
+
 func encryptionHelper(password []byte, username []byte) (macKey []byte, symmKey []byte) {
 	//MAC key generated for MAC'ing
 	var hkdfKey = userlib.Argon2Key(password, username, 32)
@@ -99,16 +105,35 @@ type User struct {
 	Password string
 	SecretKeyEnc userlib.PKEDecKey
 	DSSignKey userlib.DSSignKey
-	MAC[] byte
-	FileMap map[string][]byte
-	FileNames string
-	FileContents []byte
+	AccessTokenMap map[string] AccessToken
 	//TODO: Add files and access tokens
 
 
 	// You can add other fields here if you want...
 	// Note for JSON to marshal/unmarshal, the fields need to
 	// be public (start with a capital letter)
+}
+
+//Access Token object with the symmetric key and the unique identifier which shouldn't reveal
+//anything about the filename
+type AccessToken struct {
+	 SymmetricKey[] byte
+	 UniqueIdentifier[] byte
+}
+
+type File struct {
+	Contents[] byte
+	//SharingTree SharingTree
+}
+
+//Generates a unique access token object for a filename
+func (user *User) GenerateAccessToken(filename string) (accessToken AccessToken){
+	hkdfKey := getHKDFKey([]byte(user.Username), []byte(user.Password))
+	symmKey, _ := userlib.HashKDF(hkdfKey, []byte(filename)) //TODO: this could be repeating for the same filename!
+	uI := userlib.RandomBytes(20)
+	accessToken.SymmetricKey = symmKey
+	accessToken.UniqueIdentifier = uI
+	return accessToken
 }
 
 // This creates a user.  It will only be called once for a user
@@ -163,9 +188,13 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	userdata.SecretKeyEnc = sk
 
 	// TODO: Make empty File map? For now, assuming we add file map in StoreFile.
-	userdata.FileMap = make(map[string][]byte)
+	/*userdata.FileMap = make(map[string][]byte)
 	userdata.FileNames = ""
-	userdata.FileContents = nil
+	userdata.FileContents = nil*/
+
+	userdata.AccessTokenMap = make(map[string] AccessToken)
+
+
 
 
 	var UUID = bytesToUUID(macUsername)
@@ -175,7 +204,6 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	var encryptedData = userlib.SymEnc(symmetricKey, userlib.RandomBytes(16), data)
 	//mac user data
 	var MAC, _ = userlib.HMACEval(macKey, encryptedData)
-	userdata.MAC = MAC
 
 	var dataPlusMAC =  append(encryptedData[:], MAC[:]...) //appending MAC to encrypted user struct
 	//print(len(x) == len(encryptedData) + len(MAC))
@@ -186,6 +214,8 @@ func InitUser(username string, password string) (userdataptr *User, err error) {
 	//********************************** END OF NEW IMPLEMENTATION *****************************************************************
 	return &userdata, nil
 }
+
+
 
 // This fetches the user information from the Datastore.  It should
 // fail with an error if the user/password is invalid, or if the user
@@ -201,9 +231,9 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	if ok == false {
 		return nil, errors.New("Username/Password invalid")
 	}
-	println(" ")
-	println("AT GET USER")
-	println("LENGTH OF DATA: ", data)
+	//println(" ")
+	//println("AT GET USER")
+	//println("LENGTH OF DATA: ", data)
 	var ciphertext = data[0: len(data) - 64]
 	var macRec = data[len(data) - 64: ] //Mac received from Datastore
 	var macComp, _ = userlib.HMACEval(macKey, ciphertext) //recompute MAC
@@ -215,22 +245,23 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 	//Data is now verified, can decrypt data
 	var decryptedData = userlib.SymDec(symmKey, ciphertext)
 	_ = json.Unmarshal(decryptedData, userdataptr)
-	println("Printing user struct fields after calling storefile: ")
-	println("username: ", userdataptr.Username)
-	println("password: ", userdataptr.Password)
-	println("MAC: ", userdataptr.MAC)
-	println("File name: ", userdataptr.FileNames)
-	println("File contents: ", userdataptr.FileContents)
+	//println("Printing user struct fields after calling storefile: ")
+	//println("username: ", userdataptr.Username)
+	//println("password: ", userdataptr.Password)
+	//println("MAC: ", userdataptr.MAC)
+	//println("File name: ", userdataptr.FileNames)
+	//println("File contents: ", userdataptr.FileContents)
 
-	println("File Map: ", userdataptr.FileMap)
-	zeroKey := make([]byte, 16) //byte array of 16 0's
-	macFilename, _ := userlib.HMACEval(zeroKey, []byte("file1")) // HashFunction(filename) = HMAC(0, filename)
-	println("filename: ", string(macFilename))
-	v, ok := userdataptr.FileMap[string(macFilename)]
-	println("KEY SHOULD BE THERE! (EQUALS TRUE!) : ", ok)
-	println("filename value: ", v)
-	println("END OF GET USER")
-	println("")
+	//println("File Map: ", userdataptr.FileMap)
+	//zeroKey := make([]byte, 16) //byte array of 16 0's
+	//macFilename, _ := userlib.HMACEval(zeroKey, []byte("file1")) // HashFunction(filename) = HMAC(0, filename)
+	//println("filename: ", string(macFilename))
+	//v, ok := userdataptr.FileMap[string(macFilename)]
+	//v = v
+	//println("KEY SHOULD BE THERE! 89(EQUALS TRUE!) : ", ok)
+	//println("filename value: ", v)
+	//println("END OF GET USER")
+	//println("")
 	return userdataptr, nil
 }
 
@@ -243,20 +274,69 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 	//encrypt and MAC the file
 	username := userdata.Username
 	password := userdata.Password
-	//fileMap := make(map[string][]byte)
-
 	macKey, symmKey := encryptionHelper([]byte(password), []byte(username))
 
+
+	//fileMap := make(map[string][]byte)
+
+	//******************************START NEW IMPLEMENTATION ***************************************
+	var fileMapData map[string] File
+
+	filesUUID, _ := uuid.FromBytes([]byte("Files"))
+	data, ok := userlib.DatastoreGet(filesUUID)
+	//TODO: Verify integrity of map
+	//TODO: decrypt map
+	_ = json.Unmarshal(data, fileMapData) //getting fileMap map
+
+	if !ok {
+		return //file map has been deleted
+	}
+
+
+	accessToken := userdata.GenerateAccessToken(filename) //generate access token
+	userdata.AccessTokenMap[filename] = accessToken //store access token associated with filename
+	
+	fileMapData[string(accessToken.UniqueIdentifier)] = data
+	//
+
+
+	fileMapData[string(accessToken.UniqueIdentifier)] =
+
+
+	accessToken := userdata.GenerateAccessToken(filename) //generate access token
+	userdata.AccessTokenMap[filename] = accessToken //store access token associated with filename
+
+
+
+
+
+	macUsername, _ := userlib.HMACEval(macKey, []byte(filename))
+
+	var UUID = bytesToUUID(macUsername)
+	//Marshal the userdata struct, so it's JSON encoded.
+	var newUserData, _ = json.Marshal(userdata)
+	//encrypt user data
+	var encryptedData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), newUserData)
+	//mac user data
+	var MAC, _ = userlib.HMACEval(macKey, encryptedData)
+	var dataPlusMAC = append(encryptedData[:], MAC[:]...) //appending MAC to encrypted user struct
+	println("Encrypted user struct with newly added file: ", dataPlusMAC)
+	userlib.DatastoreSet(UUID, dataPlusMAC)
+	//******************************END NEW IMPLEMENTATION ***************************************
+
+
+/*
+
 	// Use hash function to hide the filename length.
-	zeroKey := make([]byte, 16) //byte array of 16 0's
-	macFilename, _ := userlib.HMACEval(zeroKey, []byte(filename)) // HashFunction(filename) = HMAC(0, filename)
-	println("MAC Filename: ", string(macFilename))
+	//zeroKey := make([]byte, 16) //byte array of 16 0's
+	macFilename, _ := userlib.HMACEval(macKey, []byte(filename)) // HashFunction(filename) = HMAC(0, filename)
+	//println("MAC Filename: ", string(macFilename))
 	//TODO: If the file has been shared with others, the file must stay shared.
 	//Marshal the file contents, so it's JSON encoded.
-	println("Data in string form: ", string(data))
-	var marshalFileData, _ = json.Marshal(data)
+	//println("Data in string form: ", string(data))
+	//var marshalFileData, _ = json.Marshal(data)
 	//encrypt file contents
-	var encryptedFileData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), marshalFileData)
+	var encryptedFileData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), data)
 	//mac file contents
 	var fileDataMAC, _ = userlib.HMACEval(macKey, encryptedFileData)
 	var encMACFile =  append(encryptedFileData[:], fileDataMAC[:]...) //appending MAC to encrypted file contents
@@ -273,10 +353,10 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 	//	print("Error occurred when trying to get user data from DataStore. ")
 	//	return
 	//}
-
-	println("FILE CONTENTS EXIST UP UNTIL HERE!")
+	//println("FILE CONTENTS EXIST UP UNTIL HERE!")
 	userdata.FileNames = string(macFilename)
 	userdata.FileContents = encMACFile
+
 
 	var macUsername, _ = userlib.HMACEval(macKey, []byte(username)) //Hash (MAC) username so that we can use bytesToUUID
 	var UUID = bytesToUUID(macUsername)
@@ -287,12 +367,11 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 	//mac user data
 	var MAC, _ = userlib.HMACEval(macKey, encryptedData)
 	var dataPlusMAC = append(encryptedData[:], MAC[:]...) //appending MAC to encrypted user struct
-	println("Encrypted user struct with newly added file: ", dataPlusMAC)
+	//println("Encrypted user struct with newly added file: ", dataPlusMAC)
 	userlib.DatastoreSet(UUID, dataPlusMAC)
 	//End of toy implementation
-	println("")
 
-
+*/
 	return
 }
 
@@ -312,7 +391,7 @@ func (userdata *User) AppendFile(filename string, data []byte) (err error) {
 	existingFileContents, present := fileMap[string(macFilename)]
 	// If the file does not exist, return an error.
 	if present == false {
-		return errors.New("File does not exist!")
+		return errors.New("file does not exist")
 	} else {	//Appends to the file, if it exists.
 		//get existing file data and MAC
 		existingFileData := existingFileContents[:len(existingFileContents)-64]
@@ -327,7 +406,7 @@ func (userdata *User) AppendFile(filename string, data []byte) (err error) {
 		combinedFile := append(existingFileData[:], newFileData[:]...)
 		combinedMAC := append(existingFileMAC[:], newFileMAC[:]...)
 		zeroKey := make([]byte, 16) //byte array of 16 0's
-		combinedMAC, _ = userlib.HMACEval(zeroKey, combinedMAC)
+		combinedMAC, _ = u serlib.HMACEval(zeroKey, combinedMAC)
 		combinedFileContents :=  append(combinedFile[:], combinedMAC[:]...)
 		fileMap[filename] = combinedFileContents
 		currentUserData.FileMap = fileMap
@@ -352,19 +431,36 @@ func (userdata *User) AppendFile(filename string, data []byte) (err error) {
 //
 // It should give an error if the file is corrupted in any way.
 func (userdata *User) LoadFile(filename string) (data []byte, err error) {
-	println("AT LOAD FILE")
 	username := userdata.Username
 	password := userdata.Password
+	macKey, _ := encryptionHelper([]byte(password), []byte(username))
+
+	macFileName, _ := userlib.HMACEval(macKey, []byte(filename))
+	encMacfile, ok := userdata.FileMap[string(macFileName)]
+	if ok {
+		//if file is locally saved, load
+		return encMacfile, nil
+	} else {
+
+	}
+
+/*
 	currentUserData, err := GetUser(username, password)
+
+	//If user struct is corrupted, error
+	if err != nil {
+		return nil, err
+	}
+
+
 
 	//fileMap := currentUserData.FileMap
 
-	zeroKey := make([]byte, 16) //byte array of 16 0's
 	macFilename, _ := userlib.HMACEval(zeroKey, []byte(filename)) // HashFunction(filename) = HMAC(0, filename)
 	println("MAC Filename: ", string(macFilename))
 	//println("fileMap[string(macFilename)]: ", fileMap[string(macFilename)])
 	existingFileContents := currentUserData.FileContents
-	_, symmKey := encryptionHelper([]byte(password), []byte(username))
+
 	var decryptedData = userlib.SymDec(symmKey, existingFileContents)
 	println("Decrypted File Contents: ", decryptedData)
 	//if present == false {
@@ -388,6 +484,10 @@ func (userdata *User) LoadFile(filename string) (data []byte, err error) {
 		print("DECRYPTED DATA: ", decryptedData)
 		json.Unmarshal(decryptedData, &data)
 		return data, nil
+<<<<<<< HEAD
+=======
+
+>>>>>>> 409e25caf7aec2734b8943a73f992a36fc26a184
 	}
 
 
@@ -408,7 +508,9 @@ func (userdata *User) LoadFile(filename string) (data []byte, err error) {
 	//return data, nil
 	//End of toy implementation
 
-	return
+
+ */
+	return encMacfile, nil
 }
 
 // This creates a sharing record, which is a key pointing to something
