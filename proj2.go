@@ -274,112 +274,44 @@ func GetUser(username string, password string) (userdataptr *User, err error) {
 // should NOT be revealed to the datastore!
 func (userdata *User) StoreFile(filename string, data []byte) {
 	//TODO: This is a toy implementation.
-	//encrypt and MAC the file
 	username := userdata.Username
 	password := userdata.Password
 	macKey, symmKey := encryptionHelper([]byte(password), []byte(username))
+	UUID, _ := uuid.FromBytes([]byte(userdata.Username))
 
-
-	//fileMap := make(map[string][]byte)
-
-	//******************************START NEW IMPLEMENTATION ***************************************
-	var fileMapData map[string] File
-
-	//TODO: Verify integrity of map
-	//TODO: decrypt map
-
-
+	//fetch and decrypt/verify user data. If error, return
+	userdata, err := GetUser(userdata.Username, userdata.Password)
+	if err != nil {
+		return
+	}
 
 	accessToken := userdata.GenerateAccessToken(filename) //generate access token
 
-	//Encrypt File Contents
+	//Encrypt and MAC File Contents
 	encrypedContents := userlib.SymEnc(accessToken.SymmetricKey, userlib.RandomBytes(16), data)
-	encMacContents, _ := userlib.HMACEval(accessToken.MacKey, encrypedContents)
-
-
-
-	//Mac File Contents
+	MAC, _ := userlib.HMACEval(accessToken.MacKey, encrypedContents)
+	fileDataPlusMAC :=  append(encrypedContents[:], MAC[:]...)
 
 	//Create File
+	file := File{Contents: [][]byte{fileDataPlusMAC}}
+	//TODO: Need to make SharingTree
 
-	//Store in DataStore
+	marshalledData, _ := json.Marshal(file) //Marshall Data
+	fileUUID, _:= uuid.FromBytes(accessToken.UniqueIdentifier) //Generate UUID from unique identifier
 
+	userlib.DatastoreSet(fileUUID, marshalledData) //Push (ui, file) to DataStore
+	userdata.AccessTokenMap[filename] = accessToken //set access token
 
-
-
-	userdata.AccessTokenMap[filename] = accessToken //store access token associated with filename
-
-	fileMapData[string(accessToken.UniqueIdentifier)] = data
-
-
-
-
-
-
-
-
-	macUsername, _ := userlib.HMACEval(macKey, []byte(filename))
-
-	var UUID = bytesToUUID(macUsername)
-	//Marshal the userdata struct, so it's JSON encoded.
-	var newUserData, _ = json.Marshal(userdata)
+	//Push user data
+	var data, _ = json.Marshal(userdata)
 	//encrypt user data
-	var encryptedData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), newUserData)
+	var encryptedData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), data)
 	//mac user data
-	var MAC, _ = userlib.HMACEval(macKey, encryptedData)
-	var dataPlusMAC = append(encryptedData[:], MAC[:]...) //appending MAC to encrypted user struct
-	println("Encrypted user struct with newly added file: ", dataPlusMAC)
+	var userMAC, _ = userlib.HMACEval(macKey, encryptedData)
+
+	var dataPlusMAC =  append(encryptedData[:], MAC[:]...) //appending MAC to encrypted user struct
+
 	userlib.DatastoreSet(UUID, dataPlusMAC)
-	//******************************END NEW IMPLEMENTATION ***************************************
-
-
-/*
-
-	// Use hash function to hide the filename length.
-	//zeroKey := make([]byte, 16) //byte array of 16 0's
-	macFilename, _ := userlib.HMACEval(macKey, []byte(filename)) // HashFunction(filename) = HMAC(0, filename)
-	//println("MAC Filename: ", string(macFilename))
-	//TODO: If the file has been shared with others, the file must stay shared.
-	//Marshal the file contents, so it's JSON encoded.
-	//println("Data in string form: ", string(data))
-	//var marshalFileData, _ = json.Marshal(data)
-	//encrypt file contents
-	var encryptedFileData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), data)
-	//mac file contents
-	var fileDataMAC, _ = userlib.HMACEval(macKey, encryptedFileData)
-	var encMACFile =  append(encryptedFileData[:], fileDataMAC[:]...) //appending MAC to encrypted file contents
-	userdata.FileMap[string(macFilename)] = encMACFile
-
-	//update FileMap
-	//for k,v := range fileMap {
-	//	userdata.FileMap[k] = v
-	//}
-
-	//get user data from DataStore.
-	//_, err := GetUser(username, password)
-	//if err != nil {
-	//	print("Error occurred when trying to get user data from DataStore. ")
-	//	return
-	//}
-	//println("FILE CONTENTS EXIST UP UNTIL HERE!")
-	userdata.FileNames = string(macFilename)
-	userdata.FileContents = encMACFile
-
-
-	var macUsername, _ = userlib.HMACEval(macKey, []byte(username)) //Hash (MAC) username so that we can use bytesToUUID
-	var UUID = bytesToUUID(macUsername)
-	//Marshal the userdata struct, so it's JSON encoded.
-	var newUserData, _ = json.Marshal(userdata)
-	//encrypt user data
-	var encryptedData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), newUserData)
-	//mac user data
-	var MAC, _ = userlib.HMACEval(macKey, encryptedData)
-	var dataPlusMAC = append(encryptedData[:], MAC[:]...) //appending MAC to encrypted user struct
-	//println("Encrypted user struct with newly added file: ", dataPlusMAC)
-	userlib.DatastoreSet(UUID, dataPlusMAC)
-	//End of toy implementation
-
-*/
 	return
 }
 
