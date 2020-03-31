@@ -388,8 +388,6 @@ func (userdata *User) LoadFile(filename string) (data []byte, err error) {
 		print("DECRYPTED DATA: ", decryptedData)
 		json.Unmarshal(decryptedData, &data)
 		return data, nil
-
-		return
 	}
 
 
