@@ -17,22 +17,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/proj2.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="371">
-              <caret line="454" column="19" selection-start-line="454" selection-start-column="19" selection-end-line="454" selection-end-column="19" />
-              <folding>
-                <element signature="e#179#1120#0" expanded="true" />
-                <element signature="e#1326#2253#0" />
-                <element signature="e#2384#2439#0" />
-                <element signature="e#2508#2613#0" />
-                <element signature="e#2703#3040#0" />
-                <element signature="e#3663#3719#0" />
-                <element signature="e#4351#4709#0" />
-                <element signature="e#6708#6771#0" />
-                <element signature="e#6848#6917#0" />
-                <element signature="e#6988#7047#0" />
-                <element signature="e#7120#7183#0" />
-                <element signature="e#7249#7306#0" />
-              </folding>
+            <state relative-caret-position="326">
+              <caret line="508" column="40" lean-forward="true" selection-start-line="508" selection-start-column="40" selection-end-line="508" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -40,8 +26,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/proj2_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="91">
-              <caret line="57" column="5" lean-forward="true" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
+            <state relative-caret-position="705">
+              <caret line="57" column="5" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -70,6 +56,10 @@
       <find>GenerateA</find>
       <find>Marshal</find>
       <find>json.Marshal</find>
+      <find>&amp;g</find>
+      <find>Unmarshal</find>
+      <find>datastoreSet</find>
+      <find>encryptionHelper</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -85,7 +75,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1937" />
+    <option name="x" value="-1145" />
     <option name="y" value="23" />
     <option name="width" value="1911" />
     <option name="height" value="971" />
@@ -95,7 +85,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -107,6 +96,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -125,7 +115,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="project.propDebugger" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -251,10 +241,10 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1937" y="23" width="1911" height="971" extended-state="0" />
+    <frame x="-1145" y="23" width="1911" height="971" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.04357181" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.044109736" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -267,7 +257,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.26395348" />
+      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.113953486" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -297,13 +287,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/proj2_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="91">
-          <caret line="57" column="5" lean-forward="true" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/go/src/github.com/cs161-staff/userlib/userlib.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="484">
@@ -313,22 +296,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/proj2.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="371">
-          <caret line="454" column="19" selection-start-line="454" selection-start-column="19" selection-end-line="454" selection-end-column="19" />
-          <folding>
-            <element signature="e#179#1120#0" expanded="true" />
-            <element signature="e#1326#2253#0" />
-            <element signature="e#2384#2439#0" />
-            <element signature="e#2508#2613#0" />
-            <element signature="e#2703#3040#0" />
-            <element signature="e#3663#3719#0" />
-            <element signature="e#4351#4709#0" />
-            <element signature="e#6708#6771#0" />
-            <element signature="e#6848#6917#0" />
-            <element signature="e#6988#7047#0" />
-            <element signature="e#7120#7183#0" />
-            <element signature="e#7249#7306#0" />
-          </folding>
+        <state relative-caret-position="326">
+          <caret line="508" column="40" lean-forward="true" selection-start-line="508" selection-start-column="40" selection-end-line="508" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/proj2_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="705">
+          <caret line="57" column="5" selection-start-line="57" selection-start-column="5" selection-end-line="57" selection-end-column="5" />
         </state>
       </provider>
     </entry>
