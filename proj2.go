@@ -133,7 +133,6 @@ func (user *User) GenerateAccessToken(filename string) (accessToken AccessToken)
 	symmKey = symmKey[:16]
 	uI := userlib.RandomBytes(16)
 	uI = uI[:16]
-	//crap, _ := uuid.FromBytes(uI)
 	macKey := userlib.RandomBytes(16)
 	macKey = macKey[:16]
 	accessToken.MacKey = macKey
@@ -347,12 +346,12 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 func (userdata *User) AppendFile(filename string, data []byte) (err error) {
 	fileUniqueID, fileSymmKey, fileMACKey := userdata.getAccessTokenFields(filename)
 	fileUUID, unmarshalFile, fileLoadErr := userdata.GetFile(filename, fileUniqueID)
-	encMACFileContents := unmarshalFile.Contents
 
 	//Error with loading file
 	if fileLoadErr != nil  {
 		return fileLoadErr
 	}
+	var encMACFileContents = unmarshalFile.Contents
 	//encrypt and mac new data
 	encData := userlib.SymEnc(fileSymmKey, userlib.RandomBytes(16), data)
 	macData, macErr := userlib.HMACEval(fileMACKey, encData)
@@ -384,7 +383,6 @@ func (userdata *User) AppendFile(filename string, data []byte) (err error) {
 func (userdata *User) LoadFile(filename string) (data []byte, err error) {
 	fileUniqueID, fileSymmKey, fileMACKey := userdata.getAccessTokenFields(filename)
 	_, unmarshalFile, fileLoadErr := userdata.GetFile(filename, fileUniqueID)
-
 	//Error with loading file
 	if fileLoadErr != nil  {
 		return nil, fileLoadErr
@@ -402,6 +400,7 @@ func (userdata *User) LoadFile(filename string) (data []byte, err error) {
 		encSliceData := fileSlice[:sliceLen-64]
 		ogSliceMAC :=  fileSlice[sliceLen-64:]
 		// Verify file contents integrity
+		println("file mac key length: ", len(fileMACKey))
 		newSliceMAC, sliceMACErr := userlib.HMACEval(fileMACKey, encSliceData)
 		if sliceMACErr != nil {
 			return nil, errors.New(strings.ToTitle("Error: File integrity cannot be verified!"))
@@ -480,7 +479,11 @@ func (userdata *User) ShareFile(filename string, recipient string) (
 func (userdata *User) ReceiveFile(filename string, sender string, magic_string string) error {
 	//cast magic string back to byte array and get encrypted access token and its signature
 	accessTokenAndSig:= []byte(magic_string)
-	encAT, sig := accessTokenAndSig[:len(accessTokenAndSig)-256], accessTokenAndSig[len(accessTokenAndSig)-256:]
+	println("LENGTH OF ACCESS TOKEN AND SIG: ", len(accessTokenAndSig))
+	encAT, sig := accessTokenAndSig[0:len(accessTokenAndSig)-256], accessTokenAndSig[len(accessTokenAndSig)-256:]
+	println(len(encAT))
+	println(len(sig))
+	println()
 
 	//get sender's VK and error checking
 	senderVK, senderVKExists := userlib.KeystoreGet(sender + " " + "verify key")

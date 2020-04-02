@@ -16,8 +16,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/proj2.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="528" lean-forward="true" selection-start-line="528" selection-end-line="528" />
+            <state relative-caret-position="919">
+              <caret line="319" column="40" lean-forward="true" selection-start-line="319" selection-start-column="40" selection-end-line="319" selection-end-column="40" />
               <folding>
                 <element signature="e#1287#2214#0" />
               </folding>
@@ -28,8 +28,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/proj2_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
-              <caret line="135" selection-start-line="135" selection-end-line="135" />
+            <state relative-caret-position="200">
+              <caret line="72" column="19" lean-forward="true" selection-start-line="72" selection-start-column="19" selection-end-line="72" selection-end-column="19" />
             </state>
           </provider>
         </entry>
@@ -38,7 +38,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>DatastoreSet</find>
       <find>some useful things</find>
       <find>userdataptr</find>
       <find>symmetricKey</find>
@@ -68,6 +67,7 @@
       <find>Length of</find>
       <find>UUID IN GenerateAccesstoken:</find>
       <find>Length</find>
+      <find>length of map</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -83,8 +83,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1761" />
-    <option name="y" value="23" />
+    <option name="x" value="-1122" />
+    <option name="y" value="125" />
     <option name="width" value="1911" />
     <option name="height" value="971" />
   </component>
@@ -249,8 +249,7 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1761" y="23" width="1911" height="971" extended-state="0" />
-    <editor active="true" />
+    <frame x="-1122" y="125" width="1911" height="971" extended-state="0" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13340506" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -265,7 +264,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.5046512" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.4267442" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -304,15 +303,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/proj2_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="135" selection-start-line="135" selection-end-line="135" />
+        <state relative-caret-position="200">
+          <caret line="72" column="19" lean-forward="true" selection-start-line="72" selection-start-column="19" selection-end-line="72" selection-end-column="19" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/proj2.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="528" lean-forward="true" selection-start-line="528" selection-end-line="528" />
+        <state relative-caret-position="919">
+          <caret line="319" column="40" lean-forward="true" selection-start-line="319" selection-start-column="40" selection-end-line="319" selection-end-column="40" />
           <folding>
             <element signature="e#1287#2214#0" />
           </folding>
