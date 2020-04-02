@@ -132,6 +132,8 @@ func (user *User) GenerateAccessToken(filename string) (accessToken AccessToken)
 	symmKey, _ := userlib.HashKDF(hkdfKey, []byte(filename)) //TODO: this could be repeating for the same filename!
 	symmKey = symmKey[:16]
 	uI := userlib.RandomBytes(16)
+	uI = uI[:16]
+	//crap, _ := uuid.FromBytes(uI)
 	macKey := userlib.RandomBytes(16)
 	macKey = macKey[:16]
 	accessToken.MacKey = macKey
@@ -157,7 +159,10 @@ func (userdata *User) GetFile(filename string, fileUniqueID []byte) (fileUUID uu
 	var unmarshFile File
 	unmarshFilePtr = &unmarshFile
 	//use file UUID to get file from Datastore
+
 	fileUUID, fileUUIDErr := uuid.FromBytes(fileUniqueID)
+	//println("FILE UUID: ", fileUUID.String())
+	//println("FILE UUID LENGTH: ", len(fileUUID))
 
 	if fileUUIDErr != nil {
 		println("Error: File UUID byte slice does not have a length of 16!")
@@ -295,8 +300,8 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 	username := userdata.Username
 	password := userdata.Password
 	macKey, symmKey := encryptionHelper([]byte(password), []byte(username))
-	UUID, _ := uuid.FromBytes([]byte(userdata.Username))
-
+	var macUsername, _ = userlib.HMACEval(macKey, []byte(username)) //Hash (MAC) username so that we can use bytesToUUID
+	var UUID = bytesToUUID(macUsername)
 	//fetch and decrypt/verify user data. If error, return
 	userdata, err := GetUser(userdata.Username, userdata.Password)
 	if err != nil {
@@ -304,22 +309,22 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 	}
 
 	accessToken := userdata.GenerateAccessToken(filename) //generate access token
+	userdata.AccessTokenMap[filename] = accessToken //set access token
 
 	//Encrypt and MAC File Contents
-	encrypedContents := userlib.SymEnc(accessToken.SymmetricKey, userlib.RandomBytes(16), data)
-	MAC, _ := userlib.HMACEval(accessToken.MacKey, encrypedContents)
-	fileDataPlusMAC := append(encrypedContents[:], MAC[:]...)
+	encryptedContents := userlib.SymEnc(accessToken.SymmetricKey, userlib.RandomBytes(16), data)
+	MAC, _ := userlib.HMACEval(accessToken.MacKey, encryptedContents)
+	fileDataPlusMAC := append(encryptedContents[:], MAC[:]...)
 
 	//Create File
 	fileContents := [][]byte{fileDataPlusMAC}
 	file := File{Contents: fileContents}
+
 	//TODO: Need to make SharingTree
 
 	marshalledData, _ := json.Marshal(file) //Marshall Data
 	fileUUID, _:= uuid.FromBytes(accessToken.UniqueIdentifier) //Generate UUID from unique identifier
-
 	userlib.DatastoreSet(fileUUID, marshalledData) //Push (ui, file) to DataStore
-	userdata.AccessTokenMap[filename] = accessToken //set access token
 
 	//Push user data
 	data, _ = json.Marshal(userdata)
@@ -340,13 +345,7 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 // existing file, but only whatever additional information and
 // metadata you need.
 func (userdata *User) AppendFile(filename string, data []byte) (err error) {
-	userdata, err = GetUser(userdata.Username, userdata.Password)
-	if err != nil {
-		return
-	}
-	accessToken := userdata.AccessTokenMap[filename]
-	fileUniqueID, fileSymmKey, fileMACKey :=  accessToken.UniqueIdentifier, accessToken.SymmetricKey, accessToken.MacKey
-	//fileUniqueID, fileSymmKey, fileMACKey := userdata.getAccessTokenFields(filename)
+	fileUniqueID, fileSymmKey, fileMACKey := userdata.getAccessTokenFields(filename)
 	fileUUID, unmarshalFile, fileLoadErr := userdata.GetFile(filename, fileUniqueID)
 	encMACFileContents := unmarshalFile.Contents
 
@@ -354,7 +353,6 @@ func (userdata *User) AppendFile(filename string, data []byte) (err error) {
 	if fileLoadErr != nil  {
 		return fileLoadErr
 	}
-
 	//encrypt and mac new data
 	encData := userlib.SymEnc(fileSymmKey, userlib.RandomBytes(16), data)
 	macData, macErr := userlib.HMACEval(fileMACKey, encData)
@@ -384,11 +382,6 @@ func (userdata *User) AppendFile(filename string, data []byte) (err error) {
 //
 // It should give an error if the file is corrupted in any way.
 func (userdata *User) LoadFile(filename string) (data []byte, err error) {
-	userdata, err = GetUser(userdata.Username, userdata.Password)
-	if err != nil {
-		return
-	}
-
 	fileUniqueID, fileSymmKey, fileMACKey := userdata.getAccessTokenFields(filename)
 	_, unmarshalFile, fileLoadErr := userdata.GetFile(filename, fileUniqueID)
 
@@ -425,12 +418,6 @@ func (userdata *User) LoadFile(filename string) (data []byte, err error) {
 	return decryptedFile, nil
 }
 
-
-
-
-
-
-
 // This creates a sharing record, which is a key pointing to something
 // in the datastore to share with the recipient.
 
@@ -443,6 +430,12 @@ func (userdata *User) LoadFile(filename string) (data []byte, err error) {
 // should be able to know the sender.
 func (userdata *User) ShareFile(filename string, recipient string) (
 	magic_string string, err error) {
+
+	//fetch most recent user data
+	userdata, err = GetUser(userdata.Username, userdata.Password)
+	if err != nil {
+		return
+	}
 
 	//Generates an access token to be sent to the recipient.
 	accessTokenMap := userdata.AccessTokenMap //get access token map
