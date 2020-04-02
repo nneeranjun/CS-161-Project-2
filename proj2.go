@@ -130,8 +130,10 @@ type File struct {
 func (user *User) GenerateAccessToken(filename string) (accessToken AccessToken){
 	hkdfKey := getHKDFKey([]byte(user.Username), []byte(user.Password))
 	symmKey, _ := userlib.HashKDF(hkdfKey, []byte(filename)) //TODO: this could be repeating for the same filename!
+	symmKey = symmKey[:16]
 	uI := userlib.RandomBytes(16)
 	macKey := userlib.RandomBytes(16)
+	macKey = macKey[:16]
 	accessToken.MacKey = macKey
 	accessToken.SymmetricKey = symmKey
 	accessToken.UniqueIdentifier = uI
@@ -142,7 +144,10 @@ func (userdata *User) getAccessTokenFields(filename string) (fileUniqueID []byte
 	username := userdata.Username
 	password := userdata.Password
 	//fetch user data to get accessToken. Create variables for accessToken fields.
-	datastoreUser, _ := GetUser(username, password)
+	datastoreUser, err := GetUser(username, password)
+	if err != nil {
+		return
+	}
 	accessToken := datastoreUser.AccessTokenMap[filename]
 	fileUniqueID, fileSymmKey, fileMACKey =  accessToken.UniqueIdentifier, accessToken.SymmetricKey, accessToken.MacKey
 	return fileUniqueID, fileSymmKey, fileMACKey
@@ -335,7 +340,13 @@ func (userdata *User) StoreFile(filename string, data []byte) {
 // existing file, but only whatever additional information and
 // metadata you need.
 func (userdata *User) AppendFile(filename string, data []byte) (err error) {
-	fileUniqueID, fileSymmKey, fileMACKey := userdata.getAccessTokenFields(filename)
+	userdata, err = GetUser(userdata.Username, userdata.Password)
+	if err != nil {
+		return
+	}
+	accessToken := userdata.AccessTokenMap[filename]
+	fileUniqueID, fileSymmKey, fileMACKey :=  accessToken.UniqueIdentifier, accessToken.SymmetricKey, accessToken.MacKey
+	//fileUniqueID, fileSymmKey, fileMACKey := userdata.getAccessTokenFields(filename)
 	fileUUID, unmarshalFile, fileLoadErr := userdata.GetFile(filename, fileUniqueID)
 	encMACFileContents := unmarshalFile.Contents
 
@@ -373,6 +384,11 @@ func (userdata *User) AppendFile(filename string, data []byte) (err error) {
 //
 // It should give an error if the file is corrupted in any way.
 func (userdata *User) LoadFile(filename string) (data []byte, err error) {
+	userdata, err = GetUser(userdata.Username, userdata.Password)
+	if err != nil {
+		return
+	}
+
 	fileUniqueID, fileSymmKey, fileMACKey := userdata.getAccessTokenFields(filename)
 	_, unmarshalFile, fileLoadErr := userdata.GetFile(filename, fileUniqueID)
 
