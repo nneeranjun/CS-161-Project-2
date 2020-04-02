@@ -429,42 +429,97 @@ func (userdata *User) ShareFile(filename string, recipient string) (
 	magic_string string, err error) {
 
 	//Generates an access token to be sent to the recipient.
-	accessToken := userdata.GenerateAccessToken(filename) //generate access token
-	fileUUID, unmarshalFile, fileLoadErr := userdata.GetFile(filename, accessToken.UniqueIdentifier)
+	accessTokenMap := userdata.AccessTokenMap //get access token map
+	accessToken := accessTokenMap[filename]
+	_, _, fileLoadErr := userdata.GetFile(filename, accessToken.UniqueIdentifier)
 
 	//If the file does not exist or sharing cannot complete due to malicious action, return an empty string and a non-nil error.
 	if fileLoadErr != nil  {	//File doesn't exist.
 		return "", fileLoadErr
 	}
 
-	//Add access token to recipient's user struct
-	recipientUser, getRecipientErr := GetUser(recipient, userdata.Password)
-	//recipientUser := GetUser(recipient, "PASSWORD")
-
-	if getRecipientErr != nil {
-		println("Recipient doesn't exist in Datastore!")
+	//get recipient PK and error checking
+	recipientPK, recipientPKExists := userlib.KeystoreGet(recipient + " " + "public key")
+	if !recipientPKExists {
+		println("Recipient PK doesn't exist in the Keystore!")
 	}
-	recipientATM := recipientUser.AccessTokenMap
-	recipientATM[filename] = accessToken
+
+	//marshal + encrypt access token and error checking
+	marshalAT,_ := json.Marshal(accessToken)
+	encAT, encATErr := userlib.PKEEnc(recipientPK, marshalAT)
+	if encATErr != nil {
+		println("Can't encrypt Access Token!")
+	}
+
+	//sign encrypted access token and set magic string to the encrypted access token concatenated with the signature
+	dsAT, dsATErr := userlib.DSSign(userdata.DSSignKey, encAT)
+	if dsATErr != nil {
+		println("Can't sign encrypted access token!")
+	}
+	encSignAT := append(encAT, dsAT...)
+	magic_string = string(encSignAT)
+
+	return magic_string, nil
 
 	//TODO: Update sharing tree for both sender and recipient.
-
-	//marshal and convert accessToken to string
-	marshalAT,_ := json.Marshal(accessToken)
-	atString := string(marshalAT)
-	return atString, nil
 }
 
 // Note recipient's filename can be different from the sender's filename.
 // The recipient should not be able to discover the sender's view on
 // what the filename even is!  However, the recipient must ensure that
 // it is authentically from the sender.
-func (userdata *User) ReceiveFile(filename string, sender string,
-	magic_string string) error {
+func (userdata *User) ReceiveFile(filename string, sender string, magic_string string) error {
+	//cast magic string back to byte array and get encrypted access token and its signature
+	accessTokenAndSig:= []byte(magic_string)
+	encAT, sig := accessTokenAndSig[:len(accessTokenAndSig)-256], accessTokenAndSig[len(accessTokenAndSig)-256:]
+
+	//get sender's VK and error checking
+	senderVK, senderVKExists := userlib.KeystoreGet(sender + " " + "verify key")
+	if !senderVKExists {
+		println("Sender's VK doesn't exist in the Keystore!")
+	}
+
+	//verify integrity of access token
+	verifyErr := userlib.DSVerify(senderVK, encAT, sig)
+	if verifyErr != nil {
+		return verifyErr
+	}
+
+	//Decrypt access token
+	decAT, decErr := userlib.PKEDec(userdata.SecretKeyEnc, encAT)
+	if decErr != nil {
+		println("Can't decrypt access token!")
+	}
+
+	//Unmarshal decrypted access token
+	var receivedAT AccessToken
+	json.Unmarshal(decAT, &receivedAT)
+
+	//Get user + update userstruct's access token map with received access token
+	userdata, getUserErr := GetUser(userdata.Username, userdata.Password)
+	if getUserErr != nil {
+		println("Can't get user")
+	}
+	userdata.AccessTokenMap[filename] = receivedAT
+
+	//Save userstruct in datastore
+	macKey, symmKey := encryptionHelper([]byte(userdata.Password), []byte(userdata.Username))
+	var macUsername, _ = userlib.HMACEval(macKey, []byte(userdata.Username)) //Hash (MAC) username so that we can use bytesToUUID
+	var UUID = bytesToUUID(macUsername)
+	var data, _ = json.Marshal(userdata)
+	var encryptedData = userlib.SymEnc(symmKey, userlib.RandomBytes(16), data)
+	var MAC, _ = userlib.HMACEval(macKey, encryptedData)
+	var dataPlusMAC =  append(encryptedData, MAC...) //appending MAC to encrypted user struct
+	userlib.DatastoreSet(UUID, dataPlusMAC)
+
 	return nil
 }
 
 // Removes target user's access.
 func (userdata *User) RevokeFile(filename string, target_username string) (err error) {
+
+
+
+
 	return
 }

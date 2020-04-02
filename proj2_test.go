@@ -57,13 +57,13 @@ func TestStorage(t *testing.T) {
 		return
 	}
 
-	v := []byte("This is a test")
-	u.StoreFile("file1", v)
-	print("Length of map: ")
-	print(len(u.FileMap))
-	u.StoreFile("file2", []byte("This is not a test"))
-	print("Length of map: ")
-	print(len(u.FileMap))
+	//v := []byte("This is a test")
+	//u.StoreFile("file1", v)
+	//print("Length of map: ")
+	////print(len(u.FileMap))
+	//u.StoreFile("file2", []byte("This is not a test"))
+	//print("Length of map: ")
+	////print(len(u.FileMap))
 	file, err := u.LoadFile("file1")
 	if err != nil {
 		print(err)
