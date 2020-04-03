@@ -512,7 +512,10 @@ func (userdata *User) LoadFile(filename string) (data []byte, err error) {
 		encSliceData := fileSlice[:sliceLen-64]
 		ogSliceMAC :=  fileSlice[sliceLen-64:]
 		// Verify file contents integrity
-		println("file mac key length: ", len(fileMACKey))
+		if len(fileMACKey) != 16 {
+			return nil, errors.New("Access Token has been tampered with")
+		}
+ 		println("file mac key length: ", len(fileMACKey))
 		newSliceMAC, sliceMACErr := userlib.HMACEval(fileMACKey, encSliceData)
 		if sliceMACErr != nil {
 			return nil, errors.New(strings.ToTitle("Error: File integrity cannot be verified!"))
@@ -605,7 +608,7 @@ func (userdata *User) ShareFile(filename string, recipient string) (
 		println("Can't sign encrypted access token!")
 	}
 	encSignAT := append(encAT, dsAT...)
-	magic_string = string(encSignAT)
+	magic_string = hex.EncodeToString(encSignAT)
 
 	return magic_string, nil
 
@@ -618,8 +621,16 @@ func (userdata *User) ShareFile(filename string, recipient string) (
 // it is authentically from the sender.
 func (userdata *User) ReceiveFile(filename string, sender string, magic_string string) error {
 	//cast magic string back to byte array and get encrypted access token and its signature
-	accessTokenAndSig:= []byte(magic_string)
+	//accessTokenAndSig:= []byte(magic_string)
+	accessTokenAndSig, err := hex.DecodeString(magic_string)
+	if err != nil {
+		return errors.New("access token cannot be decoded")
+	}
+
 	println("LENGTH OF ACCESS TOKEN AND SIG: ", len(accessTokenAndSig))
+	/*if len(accessTokenAndSig) != 256 {
+		return errors.New("Access Token has been tampered with")
+	}*/
 	encAT, sig := accessTokenAndSig[0:len(accessTokenAndSig)-256], accessTokenAndSig[len(accessTokenAndSig)-256:]
 	println(len(encAT))
 	println(len(sig))

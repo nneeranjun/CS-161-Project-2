@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="804f47ae-ce5e-4ac3-9ff4-4ce71d1360fe" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/proj2.go" beforeDir="false" afterPath="$PROJECT_DIR$/proj2.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proj2_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/proj2_test.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -12,20 +13,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/proj2.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="212">
-              <caret line="655" column="7" selection-start-line="655" selection-start-column="7" selection-end-line="655" selection-end-column="7" />
+            <state relative-caret-position="3171">
+              <caret line="514" column="8" selection-start-line="514" selection-start-column="8" selection-end-line="514" selection-end-column="8" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/proj2_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="406">
-              <caret line="138" selection-start-line="138" selection-end-line="138" />
+            <state relative-caret-position="403">
+              <caret line="354" column="89" selection-start-line="354" selection-start-column="89" selection-end-line="354" selection-end-column="89" />
             </state>
           </provider>
         </entry>
@@ -34,11 +35,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>symmetricKey</find>
-      <find>macKey</find>
-      <find>username</find>
-      <find>GetUser</find>
-      <find>append</find>
       <find>getUser</find>
       <find>File Map</find>
       <find>File Mapclea</find>
@@ -64,6 +60,11 @@
       <find>length of map</find>
       <find>if ok</find>
       <find>User already has access to  filename of same name.</find>
+      <find>filename</find>
+      <find>accessTokenMap</find>
+      <find>HMACEval</find>
+      <find>!= 25</find>
+      <find>!= 256</find>
     </findStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -73,8 +74,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/proj2_test.go" />
         <option value="$PROJECT_DIR$/proj2.go" />
+        <option value="$PROJECT_DIR$/proj2_test.go" />
       </list>
     </option>
   </component>
@@ -261,7 +262,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.3428165" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.30156472" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -298,17 +299,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/proj2_test.go">
+    <entry file="file://$PROJECT_DIR$/proj2.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="138" selection-start-line="138" selection-end-line="138" />
+        <state relative-caret-position="3171">
+          <caret line="514" column="8" selection-start-line="514" selection-start-column="8" selection-end-line="514" selection-end-column="8" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/proj2.go">
+    <entry file="file://$PROJECT_DIR$/proj2_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="212">
-          <caret line="655" column="7" selection-start-line="655" selection-start-column="7" selection-end-line="655" selection-end-column="7" />
+        <state relative-caret-position="403">
+          <caret line="354" column="89" selection-start-line="354" selection-start-column="89" selection-end-line="354" selection-end-column="89" />
         </state>
       </provider>
     </entry>
